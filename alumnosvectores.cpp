@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+//Comentarios boludos de mi papá
 int ingresarAlumno();
 int ingresarNota();
 void inicializar(int vec[]);
