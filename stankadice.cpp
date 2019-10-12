@@ -2,42 +2,88 @@
 #include <iostream>
 #include <time.h>
 #include <stdio.h>
+#include <sstream>
+#include <Windows.h>
+#include <cstdlib>
+#include <random>
 
 using namespace std;
 
 int calcularRandom();
-void mostrarRandom(int aux);
-int ingresarAcierto();
+void mostrarRandom(string aux);
+string ingresarAcierto();
 void inicializar(int vec[]);
-int puntaje(int acierto, int random);
+int calcPuntaje(string ingreso, string random[], int index, int puntajeActual);
+void mostrarDerrota(int aux);
+string int2string(int value);
+void inicializarVecRand(std::string  vecRand[10]);
 const int TOPE = 10;
 
-int main()	{
-	int vecRand[TOPE], vecAcierto[TOPE];
-	inicializar(vecRand);
-	for (int x = 0; x < TOPE; x++) {
-		vecRand[x] = calcularRandom();
-	}
+int main() {
+	int vecAcierto[TOPE], 
+		random = 0, 
+		puntajeActual = 0, 
+		puntajeAnterior = 0, 
+		segs=2000;
+	string ingreso;
+	string vecRand[TOPE];
+	
+	inicializarVecRand(vecRand);
+
 	for (int i = 0; i < TOPE; i++) {
-		mostrarRandom(vecRand[i]);
-		vecAcierto[i] = ingresarAcierto();
-  		puntaje(vecAcierto[i], vecRand[i]);
+			mostrarRandom(vecRand[i]);
+			if (puntajeActual == 5) {
+				segs = segs - 1000;
+			}
+			Sleep(segs);
+			system("cls");
+			ingreso = ingresarAcierto();
+			system("cls");
+			puntajeActual = calcPuntaje(ingreso, vecRand, i, puntajeAnterior);
+			if (puntajeAnterior == puntajeActual) {
+				mostrarDerrota(puntajeActual);
+				{break;}
+			}
+			else {
+				puntajeAnterior = puntajeActual;
+			}
+	}
+	if (puntajeActual == 10) {
+		cout << "CAMPEON de..... STANKA dice...." << endl;
 	}
 	system("pause");
 	return 0;
 }
 
-int calcularRandom() {
-	srand(time(NULL));
-	int aux;
-	aux = rand() % 10;
-	return 0;
+void inicializarVecRand(std::string  vecRand[10])
+{
+	for (int x = 0; x < TOPE; x++) {
+		vecRand[x] = int2string(calcularRandom());
+	}
 }
-void mostrarRandom(int aux) {
+
+string int2string(int value) {
+	std::stringstream ss;
+	ss << value;
+
+	return ss.str();
+}
+
+int calcularRandom() {
+	std::random_device rd;
+	std::mt19937 eng(rd());
+	std::uniform_int_distribution<> distr(0,9);
+	
+	return distr(eng);
+}
+void mostrarDerrota(int aux) {
+	cout << "Ha perdido, su cantidad de aciertos fue de: " << aux << endl;
+}
+void mostrarRandom(string aux) {
 	cout << "El numero es: " << aux << endl;
 }
-int ingresarAcierto() {
-	int aux;
+string ingresarAcierto() {
+	string aux;
 	cout << "Ingrese numero: ";
 	cin >> aux;
 	return aux;
@@ -48,13 +94,22 @@ void inicializar(int vec[]) {
 		vec[i] = 0;
 	}
 }
-int puntaje(int acierto, int random) {
-	int aux=0;
-	if (acierto = random) {
-		aux++;
+int calcPuntaje(string ingreso, string random[], int index, int puntajeActual) {
+	int puntajeLocal = puntajeActual;
+
+	if (ingreso.length() != index + 1) {
+		//ERROR: El tamano del ingreso es diferente del tamano del valor actual
+		return puntajeLocal;
 	}
-	if(acierto!= random){
-		cout << "Hubo un error en su jugada, su cantidad de aciertos fue de: " << aux << endl;
+
+	for(int i = 0; i <= index; i++)
+	{
+		string aux(1, ingreso[i]);
+
+		if (aux != random[i]) {
+			return puntajeLocal;
+		}
 	}
-	return aux;
+	puntajeLocal++;
+	return puntajeLocal;
 }
